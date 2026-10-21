@@ -1,0 +1,16 @@
+import path from 'node:path';
+import { createApp } from './server.js';
+import { FeishuClient, writeArticle } from './feishu.js';
+import { JobStore } from './jobs.js';
+const token = process.env.BRIDGE_TOKEN ?? '';
+if (token.length < 32) throw new Error('请先运行 npm run setup 生成至少 32 字符的 BRIDGE_TOKEN');
+const port = Number(process.env.PORT ?? 17321);
+if (!Number.isInteger(port) || port < 1024 || port > 65535) throw new Error('PORT 必须为 1024–65535 的整数');
+const appId = process.env.FEISHU_APP_ID ?? ''; const appSecret = process.env.FEISHU_APP_SECRET ?? ''; const folder = process.env.FEISHU_FOLDER_TOKEN ?? '';
+const docBase = process.env.FEISHU_DOC_BASE_URL ?? 'https://feishu.cn';
+if (!/^https:\/\/([a-z0-9-]+\.)*feishu\.cn$/.test(docBase)) throw new Error('FEISHU_DOC_BASE_URL 必须是飞书 HTTPS 域名，末尾不带斜杠');
+const jobs = new JobStore(path.resolve('.data'), docBase); await jobs.init();
+const client = new FeishuClient({ appId, appSecret });
+const app = createApp({ token, port, ready: !!(appId && appSecret && folder), jobs, staticDir: 'dist/public', write: (article, progress) => writeArticle(article, folder, client.request, progress) });
+const server = app.listen(port, '127.0.0.1', () => console.log(`Webclip 服务已启动：http://127.0.0.1:${port}；飞书配置${appId && appSecret && folder ? '已填写' : '待完成'}`));
+server.on('error', err => { console.error(err.message); process.exitCode = 1; });
