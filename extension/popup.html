@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Webclip · 网页到飞书</title><link rel="stylesheet" href="katex/katex.min.css"><link rel="stylesheet" href="popup.css"></head>
+<body>
+  <header><span class="logo">W<span>↗</span></span><div><h1>网页到飞书</h1><p>留下内容，也留下它的结构。</p></div><span class="badge">WEBCLIP</span></header>
+  <main>
+    <details id="settings"><summary>连接设置 <span id="connection">未连接</span></summary><div class="settings-body">
+      <label>本地服务端口<input id="port" type="number" min="1024" max="65535" value="17321"></label>
+      <label>本地服务配对码<input id="token" type="password" autocomplete="off" placeholder="粘贴 .env 中的 BRIDGE_TOKEN"></label>
+      <button id="save" class="secondary">保存并检查连接</button><p class="muted">App Secret 仅存放在本地服务的 .env 中。</p>
+    </div></details>
+    <section class="capture-controls"><label>提取范围<select id="mode"><option value="article">智能正文</option><option value="selection">选中内容</option><option value="page">页面主体</option></select></label><button id="capture">提取并预览 <span>↗</span></button></section>
+    <section id="result" hidden><label>文档标题<input id="title" maxlength="300"></label><div id="stats" class="stats"></div><div id="warnings" class="warnings" hidden></div><article id="preview"></article><button id="export">保存到飞书 <span>→</span></button></section>
+    <p id="status" role="status" aria-live="polite">先配置连接，再提取当前页面。</p>
+    <a id="document" target="_blank" rel="noopener noreferrer" hidden>打开飞书文档 ↗</a>
+    <progress id="progress" hidden max="100" value="0"></progress>
+  </main><footer>原生公式 · 可编辑表格 · 来源可追溯</footer>
+  <script src="popup.js"></script>
+</body></html>

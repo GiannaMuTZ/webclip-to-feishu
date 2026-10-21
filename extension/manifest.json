@@ -1,0 +1,10 @@
+{
+  "manifest_version": 3,
+  "name": "Webclip · 网页到飞书",
+  "version": "0.1.0",
+  "description": "将当前网页或选区保存为飞书文档，保留原生公式、可编辑表格和来源链接。",
+  "permissions": ["activeTab", "scripting", "storage"],
+  "host_permissions": ["http://127.0.0.1/*"],
+  "action": { "default_popup": "popup.html", "default_title": "保存到飞书" },
+  "content_security_policy": { "extension_pages": "script-src 'self'; object-src 'self'" }
+}
