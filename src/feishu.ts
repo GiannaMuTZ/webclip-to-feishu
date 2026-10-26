@@ -119,7 +119,9 @@ export async function writeArticle(article: Article, folderToken: string, reques
       const merges = t.cells.filter(c => c.rowspan > 1 || c.colspan > 1).map(c => ({ block_id: created.block_id, merge_table_cells: {
         row_start_index: c.row, row_end_index: c.row + c.rowspan, column_start_index: c.col, column_end_index: c.col + c.colspan,
       } }));
-      for (let i = 0; i < merges.length; i += 20) await request('PATCH', `${base}/batch_update?document_revision_id=-1`, { requests: merges.slice(i, i + 20) });
+      // Feishu forbids repeating a block_id in one batch, even for disjoint
+      // regions of the same table. Apply each merge in its own request.
+      for (const merge of merges) await request('PATCH', `${base}/batch_update?document_revision_id=-1`, { requests: [merge] });
     }
     completed++; await progress({ completed });
   }
