@@ -33,6 +33,23 @@ test('长文本分批且不破坏 emoji 的 UTF-16 配对', async () => {
   const runs = elements([{ kind: 'text', text: '😀'.repeat(3000) }]);
   assert.equal(runs.map(r => r.text_run.content).join(''), '😀'.repeat(3000));
 });
+test('同一表格的多个合并区域分开更新，避免飞书拒绝重复 block_id', async () => {
+  const merges: Json[][] = [];
+  await writeArticle(sample('<table><tr><th rowspan="2">模型</th><th colspan="2">结果</th></tr><tr><th>系数</th><th>标准误</th></tr></table>'), 'folder', async (method, path, body) => {
+    if (path === 'docx/v1/documents') return { document: { document_id: 'doc' } };
+    if (method === 'PATCH') {
+      const requests = body!.requests;
+      assert.equal(new Set(requests.map((r: Json) => r.block_id)).size, requests.length, 'batch 中不能重复更新同一个 block');
+      merges.push(requests);
+      return {};
+    }
+    return { children: body!.children.map((b: Json) => b.block_type === 31 ? { ...b, block_id: 'table', table: { cells: ['a', 'b', 'c', 'd', 'e', 'f'] } } : { ...b, block_id: 'paragraph' }) };
+  });
+  assert.deepEqual(merges.map(batch => batch[0].merge_table_cells), [
+    { row_start_index: 0, row_end_index: 2, column_start_index: 0, column_end_index: 1 },
+    { row_start_index: 0, row_end_index: 1, column_start_index: 1, column_end_index: 3 },
+  ]);
+});
 test('链接按飞书 schema URL 编码', () => {
   assert.equal(elements([{ kind: 'text', text: '链接', style: { link: { url: 'https://example.org/中文?a=1&b=2' } } }])[0].text_run.text_element_style.link.url, encodeURIComponent('https://example.org/中文?a=1&b=2'));
 });
