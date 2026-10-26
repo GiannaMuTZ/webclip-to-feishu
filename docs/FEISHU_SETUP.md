@@ -11,7 +11,12 @@
 
 ## 2. 开通云文档权限并发布
 
-在「权限管理」中查找并申请新版文档的创建和编辑权限。可使用覆盖读写功能的 `docx:document` 权限；如果后台展示细分权限，请根据 [创建文档](https://open.feishu.cn/document/server-docs/docs/docs/docx-v1/document/create)、[创建块](https://open.feishu.cn/document/server-docs/docs/docs/docx-v1/document-block/create) 和 [批量更新块](https://open.feishu.cn/document/server-docs/docs/docs/docx-v1/document-block/batch_update) 的权限要求开通对应项。
+在「权限管理」→「开通权限」中搜索 `docx:document`，选择 **应用身份权限（tenant_access_token）** 下的两项：
+
+- 创建新版文档：`docx:document:create`
+- 编辑新版文档：`docx:document:write_only`
+
+这两项已通过真实文档创建、公式写入、表格填充及单元格合并验证。可在 [创建文档](https://open.feishu.cn/document/server-docs/docs/docs/docx-v1/document/create)、[创建块](https://open.feishu.cn/document/server-docs/docs/docs/docx-v1/document-block/create) 和 [批量更新块](https://open.feishu.cn/document/server-docs/docs/docs/docx-v1/document-block/batch_update) 中核对接口权限。
 
 然后在「版本管理与发布」创建版本并发布，确保你的账号在应用可用范围内。组织可能要求管理员审批；后台添加了权限但未发布版本时，实际调用仍可能失败。
 
@@ -19,7 +24,7 @@
 
 ## 3. 准备保存文件夹
 
-1. 在飞书云空间创建文件夹，例如「网页收藏」。请用**云空间文件夹**，而不是知识库节点。
+1. 在飞书云文档进入「云盘」→「新建文件夹」，例如「网页收藏」。请用**云空间文件夹**，而不是知识库节点。
 2. 打开文件夹的共享/协作者设置，以应用名称搜索上面开启的机器人，添加为**可编辑**协作者。
 3. 打开文件夹链接，复制 URL 中 `/folder/` 后面的字符串作为 `FEISHU_FOLDER_TOKEN`。去掉后续 `?` 和查询参数。
 
@@ -56,7 +61,17 @@ npm start
 
 打开扩展连接设置，填写端口和 `.env` 中 `BRIDGE_TOKEN` 的值。提示「服务已连接」表示本机连接成功、配置项已填写；飞书权限会在首次保存时实际验证。
 
-## 5. 首次真实验收
+## 5. 安装浏览器扩展
+
+1. Chrome 打开 `chrome://extensions/`（Edge 使用 `edge://extensions/`）。
+2. 打开「开发者模式」，点击「加载未打包的扩展程序」或「加载已解压的扩展程序」。
+3. 选择项目内的 **`dist/extension` 文件夹**，确认列表出现「Webclip · 网页到飞书」且已启用。
+4. 打开一个普通网页，点击工具栏「保存到飞书」图标；若图标未显示，从扩展菜单找到 Webclip 并固定。
+5. 在连接设置填入端口 `17321` 和 `.env` 中的 `BRIDGE_TOKEN`，点击「保存并检查连接」。
+
+以后使用时保持本地服务运行。电脑重启后，在项目目录重新运行 `npm start`；修改扩展源码后先 `npm run build`，再到扩展管理页面重新加载。
+
+## 6. 首次真实验收
 
 打开 `http://127.0.0.1:17321/demo.html`，使用扩展提取并保存。依照 [验收清单](ACCEPTANCE.md)，在飞书中打开新文档并检查：
 
